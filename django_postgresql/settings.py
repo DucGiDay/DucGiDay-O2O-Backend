@@ -152,3 +152,4 @@ SWAGGER_SETTINGS = {
 }
 
 X_FRAME_OPTIONS = '*'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
