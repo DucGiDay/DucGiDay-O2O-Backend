@@ -150,3 +150,5 @@ SWAGGER_SETTINGS = {
     },
     "USE_SESSION_AUTH": False,  # tắt auth mặc định của Django session
 }
+
+X_FRAME_OPTIONS = '*'
