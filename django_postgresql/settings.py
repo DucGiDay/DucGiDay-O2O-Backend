@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 
+from django_postgresql.common.helpers import str_to_bool
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECRET_KEY = "django-insecure-k_g@-@yj!f&s$^@4$n0+si)7b%lhx0(ad-kyg=99w5g2s8$8l^"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG")
+DEBUG = str_to_bool(os.environ.get("DEBUG"))
 
 ALLOWED_HOSTS = ["*"]
 
@@ -151,5 +153,5 @@ SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,  # tắt auth mặc định của Django session
 }
 
-X_FRAME_OPTIONS = '*'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+X_FRAME_OPTIONS = "*"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
