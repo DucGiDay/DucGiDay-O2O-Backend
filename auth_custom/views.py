@@ -22,6 +22,7 @@ REFRESH_TOKEN_LIFETIME = timedelta(days=30)  # Thời gian sống của refresh 
 @swagger_auto_schema(
     method="post",
     operation_description="Đăng nhập",
+    operation_id='Đăng nhập',
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={

@@ -11,7 +11,7 @@ class Account(models.Model):
     password = models.CharField(max_length=128)  # Mật khẩu đã hash
     full_name = models.CharField(max_length=255, null=True, blank=True)  # Tên đầy đủ
     email = models.EmailField(null=True, blank=True)  # Email
-    avatar = models.JSONField(default=dict, blank=True, null=True) 
+    avatar = models.JSONField(default=dict, blank=True, null=True)
     roles = models.ManyToManyField(
         Role, related_name="accounts", blank=True
     )  # Liên kết nhiều-nhiều với Role

@@ -12,7 +12,7 @@ from django_postgresql.common.helpers import str_to_bool
 from django_postgresql.services.supabase_storage_service import SupabaseStorageService
 from roles.models import Role
 from .models import Account
-from .serializers import AccountSerializer, UpdateAccountSerializer
+from .serializers import AccountSerializer, RegisterSerializer, UpdateAccountSerializer
 from auth_custom.decorators import check_role
 from .swagger_schemas import (
     PAGE_PARAMETER,
@@ -20,6 +20,7 @@ from .swagger_schemas import (
     KEYWORD_PARAMETER,
     ASSIGN_ROLE_BODY,
 )
+
 
 class AccountView(APIView):
     """
@@ -68,15 +69,56 @@ class AccountView(APIView):
         )
 
     @swagger_auto_schema(
-        operation_description="Tạo tài khoản mới",
-        request_body=AccountSerializer,
+        operation_description="Đăng ký",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "username": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Tên đăng nhập"
+                ),
+                "password": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Mật khẩu"
+                ),
+                "full_name": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Họ và tên"
+                ),
+                "email": openapi.Schema(type=openapi.TYPE_STRING, description="Email"),
+                "roles": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING),
+                    description="Roles",
+                ),
+            },
+            required=["username", "password"],
+        ),
+        # responses={200: openapi.Response(description='Đăng nhập thành công')}
     )
     def post(self, request):
-        serializer = AccountSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        username = request.data.get("username")
+        password = request.data.get("password")
+
+        if not username or not password:
+            return Response(
+                {"error": "Username and password are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            if Account.objects.filter(username=username).exists():
+                return Response(
+                    {"error": "User with this username already exists."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            serializer = RegisterSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Account.DoesNotExist:
+            return Response(
+                {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class AccountDetailView(APIView):
@@ -84,7 +126,7 @@ class AccountDetailView(APIView):
     API để xử lý chi tiết, cập nhật và xóa tài khoản.
     """
 
-    parser_classes = [MultiPartParser, FormParser]
+    # parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, pk):
         account = get_object_or_404(Account, pk=pk)
@@ -131,13 +173,13 @@ class AccountDetailView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
-    def put(self, request, pk):
-        account = get_object_or_404(Account, pk=pk)
-        serializer = AccountSerializer(account, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def put(self, request, pk):
+    #     account = get_object_or_404(Account, pk=pk)
+    #     serializer = AccountSerializer(account, data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         account = get_object_or_404(Account, pk=pk)
@@ -155,7 +197,7 @@ class AssignRoleView(APIView):
     """
 
     @swagger_auto_schema(
-        operation_description="Tạo tài khoản mới",
+        operation_description="API để gắn role cho người dùng.",
         request_body=ASSIGN_ROLE_BODY,
     )
     def put(self, request, pk):
@@ -184,11 +226,14 @@ class AssignRoleView(APIView):
 
         # Serialize và trả về thông tin người dùng
         serializer = AccountSerializer(account)
-        return Response({
-            "id": account.id,
-            "username": account.username,
-            "full_name": account.full_name,
-            "roles": serializer.data.get("roles"),
-            "created_at": account.created_at,
-            "updated_at": account.updated_at,
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "id": account.id,
+                "username": account.username,
+                "full_name": account.full_name,
+                "roles": serializer.data.get("roles"),
+                "created_at": account.created_at,
+                "updated_at": account.updated_at,
+            },
+            status=status.HTTP_200_OK,
+        )

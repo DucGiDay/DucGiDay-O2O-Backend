@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_yasg",
-
     # feature app
     "roles",
     "accounts",
@@ -86,7 +85,7 @@ WSGI_APPLICATION = "django_postgresql.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DATABASE_NAME"),
+        "NAME": "django-postgresql",
         "USER": os.environ.get("DATABASE_USER"),
         "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
         "HOST": os.environ.get("DATABASE_HOST"),
@@ -141,13 +140,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SECRET_KEY = os.environ.get("SECRET_KEY", "default_secret_key")
 
 SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"',
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": 'JWT Authorization header using the Bearer scheme. Example: "Bearer {token}"',
         }
     },
-    'USE_SESSION_AUTH': False,  # tắt auth mặc định của Django session
+    "USE_SESSION_AUTH": False,  # tắt auth mặc định của Django session
 }
