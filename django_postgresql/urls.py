@@ -38,6 +38,7 @@ urlpatterns = [
     # API
     path("api/", include("roles.urls"), name="roles"),
     path("api/", include("accounts.urls"), name="accounts"),
+    path("api/", include("customers.urls"), name="customers"),
     path("api/auth/", include("auth_custom.urls"), name="auth"),
     # Swagger URLs
     path(
