@@ -30,6 +30,14 @@ DEBUG = str_to_bool(os.environ.get("DEBUG"))
 
 ALLOWED_HOSTS = ["*"]
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = (
+    True  # Sử dụng khi dùng cookie/session login (gửi withCredentials: true từ FE)
+)
 
 # Application definition
 
@@ -42,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_yasg",
+    "corsheaders",
     # feature app
     "roles",
     "accounts",
@@ -54,6 +63,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

@@ -12,6 +12,7 @@ colorama==0.4.6
 cryptography==44.0.3
 deprecation==2.1.0
 Django==4.2.20
+django-cors-headers==4.7.0
 djangorestframework==3.16.0
 drf-yasg==1.21.10
 exceptiongroup==1.2.2
