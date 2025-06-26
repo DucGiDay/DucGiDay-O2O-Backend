@@ -15,6 +15,7 @@ class TokenMiddleware:
         # Danh sách các đường dẫn không cần check authorize
         self.not_protected_paths = [
             "/api/auth/",
+            "/api/kitchen/",
             # "/any-not-auth-api/",  # Thêm 1 số API bắt đầu khác nếu cần
         ]
 
