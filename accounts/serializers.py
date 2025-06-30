@@ -22,7 +22,7 @@ class AccountSerializer(serializers.ModelSerializer):
 class UpdateAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = fields = ["username", "full_name", "email", "avatar"]
+        fields = ["username", "full_name", "email", "avatar"]
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -32,6 +32,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         required=False,
         help_text="Danh sách mã code của các role (list of strings)",
     )
+
     class Meta:
         model = Account
         fields = ["username", "full_name", "email", "password", "roles"]

@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "roles",
     "accounts",
     "products",
+    "category",
     "auth_custom",
     "customers",
 ]

@@ -36,10 +36,12 @@ schema_view = get_schema_view(
 urlpatterns = [
     path("admin/", admin.site.urls),
     # API
+    path("api/auth/", include("auth_custom.urls"), name="auth"),
     path("api/", include("roles.urls"), name="roles"),
     path("api/", include("accounts.urls"), name="accounts"),
     path("api/kitchen/", include("customers.urls"), name="customers"),
-    path("api/auth/", include("auth_custom.urls"), name="auth"),
+    path("api/", include("products.urls"), name="products"),
+    path("api/", include("category.urls"), name="category"),
     # Swagger URLs
     path(
         "swagger/",

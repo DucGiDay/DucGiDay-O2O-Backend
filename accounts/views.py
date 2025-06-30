@@ -126,7 +126,7 @@ class AccountDetailView(APIView):
     API để xử lý chi tiết, cập nhật và xóa tài khoản.
     """
 
-    # parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request, pk):
         account = get_object_or_404(Account, pk=pk)
