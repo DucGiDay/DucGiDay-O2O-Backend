@@ -7,6 +7,8 @@ from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.http import Http404
+
 
 from django_postgresql.common.helpers import str_to_bool
 from django_postgresql.services.supabase_storage_service import SupabaseStorageService
@@ -142,27 +144,54 @@ class AccountDetailView(APIView):
                 account, data=request.data, partial=True
             )
 
+            # Lấy danh sách role_codes từ request
+            role_codes = request.data.getlist("roles", [])
+            if not isinstance(role_codes, list):
+                return Response(
+                    {"error": "role_codes must be a list."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Lấy các role từ database
+            roles = Role.objects.filter(code__in=role_codes)
+            if not roles.exists():
+                return Response(
+                    {"error": "One or more roles do not exist."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # Gắn các role cho người dùng
+            account.roles.set(roles)
+
             avatar = request.FILES.get("avatar_file")
             is_delete_ava = str_to_bool(request.data.get("is_delete_ava", False))
             if serializer.is_valid():
                 supabase_service = SupabaseStorageService()
+                avatar_data = {}
                 if account.avatar and (avatar or is_delete_ava):
                     path = [account.avatar.get("path")]
                     supabase_service.delete_file(bucket="img-bucket", path=path)
-                    serializer.validated_data["avatar"] = {}
+                    # serializer.validated_data["avatar"] = {}
                 if avatar:
                     # Đẩy ảnh lên supabase, gán url và path vào avatar
                     avatar_response = supabase_service.upload_file(
                         bucket="img-bucket", file_name=avatar.name, file=avatar
                     )
 
-                    serializer.validated_data["avatar"] = avatar_response
+                    # serializer.validated_data["avatar"] = avatar_response
+                    avatar_data = avatar_response
 
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                if avatar_data is not None:
+                    serializer.save(avatar=avatar_data)
+                else:
+                    serializer.save()
+                response_data = dict(serializer.data)
+                response_data["roles"] = [
+                    role.code for role in account.roles.all()
+                ]
+                return Response(response_data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        except Account.DoesNotExist:
+        except Http404:
             return Response(
                 {"error": "Account not found."},
                 status=status.HTTP_404_NOT_FOUND,

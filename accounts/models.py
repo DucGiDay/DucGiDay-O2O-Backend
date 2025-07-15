@@ -12,6 +12,7 @@ class Account(models.Model):
     full_name = models.CharField(max_length=255, null=True, blank=True)  # Tên đầy đủ
     email = models.EmailField(null=True, blank=True)  # Email
     avatar = models.JSONField(default=dict, blank=True, null=True)
+    is_superuser = models.BooleanField(default=False)  # Quyền superuser
     roles = models.ManyToManyField(
         Role, related_name="accounts", blank=True
     )  # Liên kết nhiều-nhiều với Role
